@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Super Taxis</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/pico.min.css">
+  <script src="/static/app.js" defer></script>
+  <style>
+    :root[data-theme="light"] { --pico-font-family: Monaco, Consolas, monospace; --pico-font-size: 17px; --pico-primary-background: #243c35; --pico-primary-border: #243c35; --pico-primary-hover-background: #345448; --pico-primary-hover-border: #345448; --pico-border-radius: 12px; }
+    body { background: #f6f5ef; min-height: 100vh; }
+    main.container { max-width: 740px; padding-block: 2rem; }
+    header { margin-bottom: 1.5rem; }
+    header small { color: #52665d; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: .4rem 0; }
+    h2, h3 { margin-top: 0; }
+    article { padding: 1.6rem; border: 1px solid #e3e5dc; box-shadow: 0 8px 28px #243c3508; }
+    .step { color: #52665d; font-size: .85rem; font-weight: 600; }
+    dl { display: grid; grid-template-columns: 1fr 1fr; gap: .2rem 1rem; }
+    dt { color: #626e69; font-size: .85rem; }
+    dd { margin: 0 0 .7rem; overflow-wrap: anywhere; }
+    .wide { grid-column: 1 / -1; }
+    #trip-id, #receipt-number { font-size: .8rem; }
+    #receipt-panel { border-top: 1px dashed #cdd5cb; padding-top: 1.5rem; }
+    #receipt-cost { font-size: 2rem; font-weight: 700; color: #243c35; }
+    #message { color: #99411f; min-height: 1.5em; }
+    button { width: 100%; margin-bottom: 0; }
+    @media (max-width: 575px) { main.container { padding-block: 1rem; } article { padding: 1rem; } }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <small>Trip demo</small>
+      <h1>Super Taxis</h1>
+      <p>One journey, from pickup to receipt.</p>
+    </header>
+
+    <article id="start-panel">
+      <p class="step">1 / 3 · Ready to go</p>
+      <h2>Start a trip</h2>
+      <form id="start-trip-form">
+        <fieldset disabled>
+          <div class="grid">
+            <label>Passenger<select name="passenger_id" id="passenger" required></select></label>
+            <label>Driver<select name="driver_id" id="driver" required></select></label>
+          </div>
+          <label>City<input name="city" value="Barcelona" maxlength="200" required></label>
+          <div class="grid">
+            <label>Pickup latitude<input name="pickup_latitude" type="number" step="any" min="-90" max="90" value="41.3874" required></label>
+            <label>Pickup longitude<input name="pickup_longitude" type="number" step="any" min="-180" max="180" value="2.1686" required></label>
+          </div>
+          <button type="submit">Start trip</button>
+        </fieldset>
+      </form>
+    </article>
+
+    <article id="trip-panel" hidden>
+      <p class="step" id="trip-status">2 / 3 · In progress</p>
+      <h2 id="trip-heading" tabindex="-1">Trip in progress</h2>
+      <dl>
+        <div><dt>Passenger</dt><dd id="trip-passenger"></dd></div>
+        <div><dt>Driver</dt><dd id="trip-driver"></dd></div>
+        <div><dt>City</dt><dd id="trip-city"></dd></div>
+        <div><dt>Started</dt><dd id="trip-started"></dd></div>
+        <div class="wide"><dt>Trip ID</dt><dd id="trip-id"></dd></div>
+      </dl>
+
+      <form id="finish-trip-form">
+        <fieldset>
+          <div class="grid">
+            <label>Drop-off latitude<input name="dropoff_latitude" type="number" step="any" min="-90" max="90" value="41.4036" required></label>
+            <label>Drop-off longitude<input name="dropoff_longitude" type="number" step="any" min="-180" max="180" value="2.1744" required></label>
+          </div>
+          <label>Distance (metres)<input name="distance_meters" type="number" step="1" min="0" max="2147483647" value="2500" required></label>
+          <div class="grid">
+            <label>Cost<input name="cost" type="number" step="0.01" min="0" max="9999999999.99" value="12.50" required></label>
+            <label>Currency<input name="currency" value="EUR" pattern="[A-Z]{3}" minlength="3" maxlength="3" required></label>
+          </div>
+          <button type="submit">Finish trip</button>
+        </fieldset>
+      </form>
+
+      <section id="receipt-panel" hidden>
+        <h3>Receipt</h3>
+        <p id="receipt-cost"></p>
+        <dl>
+          <div class="wide"><dt>Receipt number</dt><dd id="receipt-number"></dd></div>
+          <div><dt>Issued</dt><dd id="receipt-issued"></dd></div>
+          <div><dt>Distance</dt><dd id="receipt-distance"></dd></div>
+        </dl>
+        <button type="button" id="another-trip">Start another trip</button>
+      </section>
+    </article>
+
+    <p id="message" role="status" aria-live="polite">Loading passengers and drivers…</p>
+    <noscript>This demo needs JavaScript enabled to start and finish trips.</noscript>
+  </main>
+</body>
+</html>
