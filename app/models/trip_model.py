@@ -24,9 +24,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 if TYPE_CHECKING:
-    from app.models.driver import Driver
-    from app.models.passenger import Passenger
-    from app.models.receipt import Receipt
+    from app.models.driver_model import Driver
+    from app.models.passenger_model import Passenger
+    from app.models.receipt_model import Receipt
 
 
 class TripStatus(StrEnum):
@@ -45,6 +45,9 @@ class Trip(Base):
         CheckConstraint("length(trim(city)) > 0", name="city_not_blank"),
         CheckConstraint("currency ~ '^[A-Z]{3}$'", name="currency_format"),
         CheckConstraint(
+            "(cost IS NULL) = (currency IS NULL)", name="cost_currency_pair"
+        ),
+        CheckConstraint(
             "pickup_latitude BETWEEN -90 AND 90", name="pickup_latitude_range"
         ),
         CheckConstraint(
@@ -61,15 +64,13 @@ class Trip(Base):
             name="dropoff_coordinate_pair",
         ),
         CheckConstraint("distance_meters >= 0", name="distance_nonnegative"),
-        CheckConstraint(
-            "fare_amount BETWEEN 0 AND 9999999999.99", name="fare_amount_range"
-        ),
+        CheckConstraint("cost BETWEEN 0 AND 9999999999.99", name="cost_range"),
         CheckConstraint("completed_at >= started_at", name="completion_time_order"),
         CheckConstraint(
             "(status = 'IN_PROGRESS' AND completed_at IS NULL) OR "
             "(status = 'COMPLETED' AND completed_at IS NOT NULL AND "
             "dropoff_latitude IS NOT NULL AND dropoff_longitude IS NOT NULL AND "
-            "distance_meters IS NOT NULL AND fare_amount IS NOT NULL)",
+            "distance_meters IS NOT NULL AND cost IS NOT NULL AND currency IS NOT NULL)",
             name="completion_details",
         ),
         CheckConstraint(
@@ -112,8 +113,8 @@ class Trip(Base):
     dropoff_latitude: Mapped[float | None]
     dropoff_longitude: Mapped[float | None]
     distance_meters: Mapped[int | None] = mapped_column(Integer)
-    fare_amount: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
-    currency: Mapped[str] = mapped_column(String(3))
+    cost: Mapped[Decimal | None] = mapped_column(Numeric(12, 2))
+    currency: Mapped[str | None] = mapped_column(String(3))
 
     passenger: Mapped[Passenger] = relationship(back_populates="trips")
     driver: Mapped[Driver] = relationship(back_populates="trips")

@@ -102,14 +102,18 @@ def upgrade() -> None:
         sa.Column("dropoff_latitude", sa.Double(), nullable=True),
         sa.Column("dropoff_longitude", sa.Double(), nullable=True),
         sa.Column("distance_meters", sa.Integer(), nullable=True),
-        sa.Column("fare_amount", sa.Numeric(precision=12, scale=2), nullable=True),
-        sa.Column("currency", sa.String(length=3), nullable=False),
+        sa.Column("cost", sa.Numeric(precision=12, scale=2), nullable=True),
+        sa.Column("currency", sa.String(length=3), nullable=True),
         sa.CheckConstraint(
-            "(status = 'IN_PROGRESS' AND completed_at IS NULL) OR (status = 'COMPLETED' AND completed_at IS NOT NULL AND dropoff_latitude IS NOT NULL AND dropoff_longitude IS NOT NULL AND distance_meters IS NOT NULL AND fare_amount IS NOT NULL)",
+            "(status = 'IN_PROGRESS' AND completed_at IS NULL) OR (status = 'COMPLETED' AND completed_at IS NOT NULL AND dropoff_latitude IS NOT NULL AND dropoff_longitude IS NOT NULL AND distance_meters IS NOT NULL AND cost IS NOT NULL AND currency IS NOT NULL)",
             name=op.f("ck_trips_completion_details"),
         ),
         sa.CheckConstraint(
             "currency ~ '^[A-Z]{3}$'", name=op.f("ck_trips_currency_format")
+        ),
+        sa.CheckConstraint(
+            "(cost IS NULL) = (currency IS NULL)",
+            name=op.f("ck_trips_cost_currency_pair"),
         ),
         sa.CheckConstraint(
             "payment_status != 'PAID' OR status = 'COMPLETED'",
@@ -134,8 +138,8 @@ def upgrade() -> None:
             name=op.f("ck_trips_dropoff_longitude_range"),
         ),
         sa.CheckConstraint(
-            "fare_amount BETWEEN 0 AND 9999999999.99",
-            name=op.f("ck_trips_fare_amount_range"),
+            "cost BETWEEN 0 AND 9999999999.99",
+            name=op.f("ck_trips_cost_range"),
         ),
         sa.CheckConstraint(
             "length(trim(city)) > 0", name=op.f("ck_trips_city_not_blank")
