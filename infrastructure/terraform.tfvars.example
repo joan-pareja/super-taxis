@@ -1,0 +1,9 @@
+project_id = "your-gcp-project-id"
+region     = "europe-west1"
+
+# Leave null for the first apply, then build/push the app and set its image digest.
+app_image = null
+
+database_password         = "replace-with-a-random-password-at-least-24-characters"
+database_password_version = 1
+protect_database          = true

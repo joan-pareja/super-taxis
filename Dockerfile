@@ -16,7 +16,9 @@ COPY app ./app
 COPY alembic.ini ./
 COPY migrations ./migrations
 
-RUN useradd --system --uid 10001 --create-home appuser
+RUN useradd --system --uid 10001 --create-home appuser \
+    && touch /app/.env \
+    && chown appuser /app/.env
 USER appuser
 
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
