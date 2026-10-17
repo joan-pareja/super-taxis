@@ -1,0 +1,7 @@
+interface:
+  display_name: "Excalidraw Diagrams"
+  short_description: "Create clean, movable Excalidraw diagrams"
+  default_prompt: "Use $excalidraw-diagrams to create or improve this repository diagram."
+
+policy:
+  allow_implicit_invocation: false

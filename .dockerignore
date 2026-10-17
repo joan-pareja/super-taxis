@@ -6,4 +6,5 @@
 **/*.py[cod]
 .env
 .env.*
+docs
 .codex
