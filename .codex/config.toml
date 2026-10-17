@@ -1,0 +1,5 @@
+[mcp_servers.gcloud]
+command = "powershell.exe"
+args = ["-NoProfile", "-File", "scripts/start_gcloud_mcp.ps1"]
+startup_timeout_sec = 60
+tool_timeout_sec = 120
