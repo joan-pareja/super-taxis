@@ -1,0 +1,28 @@
+bundle:
+  name: super-taxis-analytics
+
+workspace:
+  host: https://dbc-3c0a220f-6c56.cloud.databricks.com
+  root_path: /Workspace/Users/${workspace.current_user.userName}/super-taxis-analytics
+
+sync:
+  include:
+    - data/nyc_trips_2015.csv
+    - data/nyc_trips_2015.json
+
+resources:
+  jobs:
+    pickup_demand:
+      name: super-taxis-pickup-demand
+      max_concurrent_runs: 1
+      timeout_seconds: 900
+      tasks:
+        - task_key: pickup_demand
+          notebook_task:
+            notebook_path: notebooks/pickup_demand.py
+            base_parameters:
+              input_path: ${workspace.file_path}/data/nyc_trips_2015.csv
+
+targets:
+  demo:
+    default: true

@@ -6,4 +6,5 @@ This is a small monorepo maintained by a single developer.
 - Keep the implementation and workflow simple, focused on an easy-to-explain MVP.
 - Add structure, dependencies, and abstractions only when they serve an agreed requirement.
 - Use the repository's `gcloud` MCP to interact with GCP.
+- Use the Databricks CLI profile `super-taxis` for workspace uploads and bundle deployment/runs; authenticate with browser-based `databricks auth login` and keep credentials out of Git.
 - Use the local [wrap-up skill](.agents/skills/wrap-up/SKILL.md) when preparing commit messages.
