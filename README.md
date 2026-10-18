@@ -143,3 +143,32 @@ gcloud auth login --update-adc
 ```
 
 **Terraform reads the credentials file directly**, using `credentials_file` from `terraform.tfvars`; no authentication environment variables need setting before Terraform commands. The MCP launcher sets its own credential folder automatically. For direct `gcloud` commands or Docker pushes in a new terminal, set `CLOUDSDK_CONFIG` as above so they use the same repository login. Credentials are excluded from Git and Docker builds; access permissions still come from GCP IAM.
+
+## Data infiltration and exfiltration
+
+**The public demo uses fictional data and has no user login.** Before production, we would add the following protections.
+
+**Prevent unwanted data entering or changing the system:**
+
+- **Authenticate requests:** add user login and send an access token with API requests. Google API Gateway can validate the token before forwarding the request to FastAPI.
+- **Authorize each action:** the backend must check that the caller can change that specific trip. For example, only the assigned driver could finish it. Validated input and database constraints would continue to reject invalid values.
+
+**Prevent data leaving without permission:**
+
+- **Restrict what each user can read:** passengers could access only their own trips and receipts; broader access would require an authorized role. A valid login would not grant access to everyone else's data.
+- **Protect database access:** the demo already uses a PostgreSQL username and password stored in Secret Manager. IAM database authentication is an alternative for production. Database permissions should grant only the access each service needs.
+- **Secure the connection:** Cloud Run uses a dedicated **service account**, the application's Google Cloud identity. Its IAM permissions allow the [Cloud SQL Auth Proxy integration](https://docs.cloud.google.com/sql/docs/postgres/sql-proxy) to establish an encrypted connection to Cloud SQL. PostgreSQL then separately checks the database username and password. Both checks are required in our setup.
+
+## Vision for the next 2–3 years
+
+```mermaid
+flowchart LR
+    A["Reliable operations"] --> B["Trusted analytical platform"]
+    B --> C["Data products and ML"]
+```
+
+Grow the platform in three stages, guided by business needs and measured results:
+
+1. **Build reliable operations.** Prioritize a stable, responsive application with quick transactions and a simple user experience. Add production access controls, monitoring and recovery procedures. Keep the data model focused on what is needed, measure performance, and scale when there is evidence to justify it.
+2. **Develop a trusted analytical platform.** Automate the flow from operational PostgreSQL into a separate analytical layer. Add quality checks where errors would affect decisions, catalog the datasets, document their meaning and lineage, and control access and retention. Make data easy to discover and explore so teams can develop new use cases.
+3. **Deliver useful data products.** Build revenue and trip metrics, fraud detection and location-based demand analysis. Introduce forecasting and ML where they improve decisions, such as taxi placement throughout the day. Start with simple baselines, measure business impact, and monitor model performance before expanding.
