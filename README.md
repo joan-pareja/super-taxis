@@ -78,7 +78,7 @@ Deployment follows three steps:
 
 Cloud startup loads the database settings, runs **Alembic migrations and the demo seed**, then starts FastAPI. Docker Compose coordinates the local containers; Terraform manages the cloud resources.
 
-To deploy your own copy, install Terraform 1.11 or later (below 2.0), the Google Cloud CLI and Docker, and use a GCP project with billing enabled. Copy [the example inputs](infrastructure/terraform.tfvars.example) to `infrastructure/terraform.tfvars`, set your project and database password, and leave `app_image = null` for the first apply. This file is ignored by Git. After authenticating as described below, run from the repository root:
+To deploy your own copy, install Terraform 1.11 or later (below 2.0), the Google Cloud CLI and Docker, and use a GCP project with billing enabled. Copy [the example inputs](infrastructure/terraform.tfvars.example) to `infrastructure/terraform.tfvars`, set your project and database password, and leave `app_image = null` for the first apply. The `credentials_file` setting points to your local Google login file. These local files are ignored by Git. After authenticating as described below, run from the repository root:
 
 ```sh
 terraform -chdir=infrastructure init
@@ -135,12 +135,11 @@ The bundle targets the demo workspace. To use another workspace, update `workspa
 - **[The gcloud MCP configuration](.codex/config.toml)** lets a coding assistant inspect and manage GCP resources through the Google Cloud CLI. Its [launcher](scripts/start_gcloud_mcp.ps1) pins the MCP version and uses a repository-specific credential folder under `.cache/gcloud/`.
 - **The Databricks CLI** uses the `super-taxis` profile for browser-based authentication, notebook uploads and bundle deployment/runs. Credentials stay outside Git.
 
-For GCP access, run once from the repository root in PowerShell:
+To create or renew the repository's Google login, run from the repository root in PowerShell:
 
 ```powershell
 $env:CLOUDSDK_CONFIG = Join-Path $PWD '.cache/gcloud'
 gcloud auth login --update-adc
-$env:GOOGLE_APPLICATION_CREDENTIALS = Join-Path $env:CLOUDSDK_CONFIG 'application_default_credentials.json'
 ```
 
-Set the two environment variables again in a new terminal; repeat login when authentication needs renewing. The CLI and Terraform use the local credentials, which are excluded from Git and Docker builds. This keeps repository logins separate; access permissions still come from GCP IAM.
+**Terraform reads the credentials file directly**, using `credentials_file` from `terraform.tfvars`; no authentication environment variables need setting before Terraform commands. The MCP launcher sets its own credential folder automatically. For direct `gcloud` commands or Docker pushes in a new terminal, set `CLOUDSDK_CONFIG` as above so they use the same repository login. Credentials are excluded from Git and Docker builds; access permissions still come from GCP IAM.

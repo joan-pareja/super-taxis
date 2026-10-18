@@ -3,6 +3,11 @@ variable "project_id" {
   type        = string
 }
 
+variable "credentials_file" {
+  description = "Path to the local Google login JSON file, relative to the infrastructure folder."
+  type        = string
+}
+
 variable "region" {
   description = "Region shared by the application, database and image repository."
   type        = string

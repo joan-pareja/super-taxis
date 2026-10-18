@@ -1,5 +1,6 @@
-project_id = "your-gcp-project-id"
-region     = "europe-west1"
+project_id       = "your-gcp-project-id"
+region           = "europe-west1"
+credentials_file = "../.cache/gcloud/application_default_credentials.json"
 
 # Leave null for the first apply, then build/push the app and set its image digest.
 app_image = null

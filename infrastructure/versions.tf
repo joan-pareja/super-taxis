@@ -10,6 +10,7 @@ terraform {
 }
 
 provider "google" {
-  project = var.project_id
-  region  = var.region
+  project     = var.project_id
+  region      = var.region
+  credentials = file("${path.module}/${var.credentials_file}")
 }
